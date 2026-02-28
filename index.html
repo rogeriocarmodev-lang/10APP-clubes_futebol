@@ -880,6 +880,22 @@
       margin-top: 2px;
     }
 
+    .btn-viewer {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #00d4ff;
+      color: #0a0a1a;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    .btn-viewer:hover {
+      background: #fff;
+      transform: translateY(-2px);
+    }
+
     @media(max-width:900px) {
       .main-grid {
         grid-template-columns: 1fr;
@@ -907,9 +923,12 @@
       Football Explorer
       <span>AUTO FLOW — SISTEMA DE CONSULTA</span>
     </div>
-    <div class="status-bar">
-      <div class="status-dot"></div>
-      API-Football v3
+    <div style="display:flex;align-items:center;gap:16px;">
+      <a href="clubes-viewer.html" class="btn-viewer">Ver Clubes Cadastrados →</a>
+      <div class="status-bar">
+        <div class="status-dot"></div>
+        API-Football v3
+      </div>
     </div>
   </header>
 
