@@ -1,0 +1,7 @@
+.gemini/
+.agent/
+.agents/
+node_modules/
+*.log
+tmp/
+C:\Users\Rogério Carmo\.gemini\antigravity\brain\
