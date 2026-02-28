@@ -1,390 +1,891 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clubes Cadastrados — Auto Flow</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-  :root {
-    --bg:#0a0a0f; --surface:#12121a; --surface2:#1a1a26;
-    --border:#2a2a3a; --accent:#00e5ff; --accent2:#7c3aed;
-    --text:#e8e8f0; --muted:#6b6b80; --success:#00c853;
-    --warning:#ffab00; --danger:#ff3d5a;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
-  body::before{content:'';position:fixed;top:-200px;left:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,229,255,0.05) 0%,transparent 70%);pointer-events:none;z-index:0;}
-  body::after{content:'';position:fixed;bottom:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,0.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clubes Cadastrados — Auto Flow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a26;
+      --border: #2a2a3a;
+      --accent: #00e5ff;
+      --accent2: #7c3aed;
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --success: #00c853;
+      --warning: #ffab00;
+      --danger: #ff3d5a;
+    }
 
-  header{position:relative;z-index:10;padding:24px 40px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,15,0.9);backdrop-filter:blur(20px);}
-  .logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-  .logo span{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:300;letter-spacing:4px;color:var(--muted);display:block;margin-top:-4px;-webkit-text-fill-color:var(--muted);}
-  .header-right{display:flex;align-items:center;gap:12px;}
-  .btn-back{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:all 0.2s;}
-  .btn-back:hover{border-color:var(--accent);color:var(--accent);}
-  .total-badge{background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--accent);}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  .container{position:relative;z-index:1;max-width:1500px;margin:0 auto;padding:32px 40px;}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+    }
 
-  /* Stats */
-  .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:28px;}
-  .stat-item{background:var(--surface);padding:16px 24px;text-align:center;}
-  .stat-value{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--accent);line-height:1;}
-  .stat-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-top:4px;}
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px;
+      left: -200px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
 
-  /* Filters */
-  .filters-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px;}
-  .filters-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
-  .filters-title::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px;}
-  .filters-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:12px;align-items:end;}
-  .filter-group{display:flex;flex-direction:column;gap:6px;}
-  .filter-group label{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);}
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -200px;
+      right: -200px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(124, 58, 237, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
 
-  input[type=text], select{
-    width:100%;padding:9px 14px;background:var(--surface2);border:1px solid var(--border);
-    border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;
-    transition:all 0.2s;appearance:none;-webkit-appearance:none;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b80' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;background-position:right 12px center;
-  }
-  input[type=text]{background-image:none;}
-  input[type=text]:focus, select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,255,0.08);}
-  input[type=text]::placeholder{color:var(--muted);}
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 24px 40px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10, 10, 15, 0.9);
+      backdrop-filter: blur(20px);
+    }
 
-  .btn{padding:9px 20px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
-  .btn-primary{background:linear-gradient(135deg,var(--accent),#0099bb);color:#000;}
-  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,229,255,0.25);}
-  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
-  .btn-ghost:hover{border-color:var(--muted);color:var(--text);}
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-  /* Table */
-  .table-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-  .table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-  .table-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--muted);display:flex;align-items:center;gap:8px;}
-  .table-title::before{content:'';width:3px;height:14px;background:var(--accent2);border-radius:2px;}
-  .showing-info{font-size:12px;color:var(--muted);}
-  .showing-info span{color:var(--text);font-weight:600;}
+    .logo span {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 4px;
+      color: var(--muted);
+      display: block;
+      margin-top: -4px;
+      -webkit-text-fill-color: var(--muted);
+    }
 
-  .table-wrap{overflow-x:auto;}
-  table{width:100%;border-collapse:collapse;}
-  thead th{padding:12px 16px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);border-bottom:1px solid var(--border);background:var(--surface);white-space:nowrap;cursor:pointer;user-select:none;transition:color 0.2s;}
-  thead th:hover{color:var(--accent);}
-  thead th.sort-asc::after{content:' ↑';color:var(--accent);}
-  thead th.sort-desc::after{content:' ↓';color:var(--accent);}
-  tbody tr{border-bottom:1px solid rgba(42,42,58,0.4);transition:background 0.15s;}
-  tbody tr:hover{background:rgba(255,255,255,0.025);}
-  tbody tr:last-child{border-bottom:none;}
-  td{padding:12px 16px;font-size:13px;vertical-align:middle;}
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-  .club-cell{display:flex;align-items:center;gap:12px;min-width:180px;}
-  .club-logo{width:38px;height:38px;object-fit:contain;flex-shrink:0;}
-  .club-name{font-weight:600;font-size:14px;color:var(--text);}
-  .club-country{font-size:11px;color:var(--muted);margin-top:1px;}
+    .btn-back {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
 
-  .badge-year{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.2);}
-  .liga-tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:500;background:rgba(0,229,255,0.08);color:var(--accent);border:1px solid rgba(0,229,255,0.15);margin:2px 2px 2px 0;white-space:nowrap;}
-  .liga-tag.cup{background:rgba(255,171,0,0.08);color:var(--warning);border-color:rgba(255,171,0,0.15);}
-  .temp-tag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;background:rgba(124,58,237,0.08);color:#a78bfa;border:1px solid rgba(124,58,237,0.15);margin:2px 2px 2px 0;}
-  .city-text{color:var(--text);font-size:13px;}
-  .city-state{color:var(--muted);font-size:11px;margin-top:1px;}
-  .stadium-text{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);}
+    .btn-back:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
 
-  /* Loading skeleton */
-  .skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:4px;height:14px;}
-  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .total-badge {
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+    }
 
-  /* Empty state */
-  .empty-state{padding:60px 20px;text-align:center;}
-  .empty-icon{font-size:48px;margin-bottom:16px;opacity:0.3;}
-  .empty-title{font-size:16px;font-weight:500;color:var(--muted);margin-bottom:8px;}
-  .empty-sub{font-size:13px;color:var(--border);}
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 32px 40px;
+    }
 
-  /* Pagination */
-  .pagination{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-top:1px solid var(--border);}
-  .page-info{font-size:13px;color:var(--muted);}
-  .page-info span{color:var(--text);font-weight:600;}
-  .page-btns{display:flex;align-items:center;gap:4px;}
-  .page-btn{width:36px;height:36px;border:1px solid var(--border);background:var(--surface2);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
-  .page-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
-  .page-btn.active{background:var(--accent);border-color:var(--accent);color:#000;font-weight:700;}
-  .page-btn:disabled{opacity:0.3;cursor:not-allowed;}
-  .page-btn.arrow{font-size:16px;}
+    /* Stats */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
 
-  ::-webkit-scrollbar{width:4px;height:4px;}
-  ::-webkit-scrollbar-track{background:transparent;}
-  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+    .stat-item {
+      background: var(--surface);
+      padding: 16px 24px;
+      text-align: center;
+    }
 
-  @media(max-width:1100px){
-    .filters-grid{grid-template-columns:1fr 1fr;}
-    .stats-bar{grid-template-columns:repeat(2,1fr);}
-    .container{padding:20px;}
-    header{padding:16px 20px;}
-  }
-</style>
+    .stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Filters */
+    .filters-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .filters-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filters-title::before {
+      content: '';
+      width: 3px;
+      height: 14px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .filter-group label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+    }
+
+    input[type=text],
+    select {
+      width: 100%;
+      padding: 9px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      transition: all 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b80' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+
+    input[type=text] {
+      background-image: none;
+    }
+
+    input[type=text]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.08);
+    }
+
+    input[type=text]::placeholder {
+      color: var(--muted);
+    }
+
+    .btn {
+      padding: 9px 20px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #0099bb);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(0, 229, 255, 0.25);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--muted);
+      color: var(--text);
+    }
+
+    /* Table */
+    .table-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .table-title::before {
+      content: '';
+      width: 3px;
+      height: 14px;
+      background: var(--accent2);
+      border-radius: 2px;
+    }
+
+    .showing-info {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .showing-info span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s;
+    }
+
+    thead th:hover {
+      color: var(--accent);
+    }
+
+    thead th.sort-asc::after {
+      content: ' ↑';
+      color: var(--accent);
+    }
+
+    thead th.sort-desc::after {
+      content: ' ↓';
+      color: var(--accent);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(42, 42, 58, 0.4);
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    td {
+      padding: 12px 16px;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .club-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 180px;
+    }
+
+    .club-logo {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .club-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .club-country {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .badge-year {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(124, 58, 237, 0.15);
+      color: #a78bfa;
+      border: 1px solid rgba(124, 58, 237, 0.2);
+    }
+
+    .liga-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 500;
+      background: rgba(0, 229, 255, 0.08);
+      color: var(--accent);
+      border: 1px solid rgba(0, 229, 255, 0.15);
+      margin: 2px 2px 2px 0;
+      white-space: nowrap;
+    }
+
+    .liga-tag.cup {
+      background: rgba(255, 171, 0, 0.08);
+      color: var(--warning);
+      border-color: rgba(255, 171, 0, 0.15);
+    }
+
+    .temp-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 500;
+      background: rgba(124, 58, 237, 0.08);
+      color: #a78bfa;
+      border: 1px solid rgba(124, 58, 237, 0.15);
+      margin: 2px 2px 2px 0;
+    }
+
+    .city-text {
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .city-state {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 1px;
+    }
+
+    .stadium-text {
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--text);
+    }
+
+    /* Loading skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 4px;
+      height: 14px;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0
+      }
+
+      100% {
+        background-position: -200% 0
+      }
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    .empty-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .empty-sub {
+      font-size: 13px;
+      color: var(--border);
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .page-info {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .page-info span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .page-btns {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .page-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .page-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+      font-weight: 700;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .page-btn.arrow {
+      font-size: 16px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    @media(max-width:1100px) {
+      .filters-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stats-bar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      header {
+        padding: 16px 20px;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  <div class="logo">
-    Clubes Cadastrados
-    <span>AUTO FLOW — BANCO DE DADOS</span>
-  </div>
-  <div class="header-right">
-    <a href="index.html" class="btn-back">← Voltar ao Explorer</a>
-    <div class="total-badge" id="total-badge">— clubes</div>
-  </div>
-</header>
+  <header>
+    <div class="logo">
+      Clubes Cadastrados
+      <span>AUTO FLOW — BANCO DE DADOS</span>
+    </div>
+    <div class="header-right">
+      <a href="index.html" class="btn-back">← Voltar ao Explorer</a>
+      <div class="total-badge" id="total-badge">— clubes</div>
+    </div>
+  </header>
 
-<div class="container">
+  <div class="container">
 
-  <!-- Stats -->
-  <div class="stats-bar">
-    <div class="stat-item">
-      <div class="stat-value" id="stat-total">—</div>
-      <div class="stat-label">Total de Clubes</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-value" id="stat-paises">—</div>
-      <div class="stat-label">Países</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-value" id="stat-ligas">—</div>
-      <div class="stat-label">Ligas / Copas</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-value" id="stat-temporadas">—</div>
-      <div class="stat-label">Temporadas</div>
-    </div>
-  </div>
-
-  <!-- Filters -->
-  <div class="filters-panel">
-    <div class="filters-title">Filtros</div>
-    <div class="filters-grid">
-      <div class="filter-group">
-        <label>Buscar clube</label>
-        <input type="text" id="f-nome" placeholder="Nome do clube..." oninput="debounceSearch()">
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-value" id="stat-total">—</div>
+        <div class="stat-label">Total de Clubes</div>
       </div>
-      <div class="filter-group">
-        <label>País</label>
-        <select id="f-pais" onchange="aplicarFiltros()">
-          <option value="">Todos os países</option>
-        </select>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-paises">—</div>
+        <div class="stat-label">Países</div>
       </div>
-      <div class="filter-group">
-        <label>Liga / Copa</label>
-        <select id="f-liga" onchange="aplicarFiltros()">
-          <option value="">Todas as ligas</option>
-        </select>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-ligas">—</div>
+        <div class="stat-label">Ligas / Copas</div>
       </div>
-      <div class="filter-group">
-        <label>Temporada</label>
-        <select id="f-temporada" onchange="aplicarFiltros()">
-          <option value="">Todas as temporadas</option>
-        </select>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-primary" onclick="aplicarFiltros()">🔍 Filtrar</button>
-        <button class="btn btn-ghost" onclick="limparFiltros()">✕</button>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-temporadas">—</div>
+        <div class="stat-label">Temporadas</div>
       </div>
     </div>
+
+    <!-- Filters -->
+    <div class="filters-panel">
+      <div class="filters-title">Filtros</div>
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Buscar clube</label>
+          <input type="text" id="f-nome" placeholder="Nome do clube..." oninput="debounceSearch()">
+        </div>
+        <div class="filter-group">
+          <label>País</label>
+          <select id="f-pais" onchange="aplicarFiltros()">
+            <option value="">Todos os países</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Liga / Copa</label>
+          <select id="f-liga" onchange="aplicarFiltros()">
+            <option value="">Todas as ligas</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Temporada</label>
+          <select id="f-temporada" onchange="aplicarFiltros()">
+            <option value="">Todas as temporadas</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary" onclick="aplicarFiltros()">🔍 Filtrar</button>
+          <button class="btn btn-ghost" onclick="limparFiltros()">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-panel">
+      <div class="table-header">
+        <div class="table-title">Resultados</div>
+        <div class="showing-info" id="showing-info">Carregando...</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="sortBy('nome')">Clube</th>
+              <th onclick="sortBy('cidade')">Cidade / Estado</th>
+              <th onclick="sortBy('estadio')">Estádio</th>
+              <th onclick="sortBy('fundacao')">Fundação</th>
+              <th>Ligas</th>
+              <th>Temporadas</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            ${skeletonRows(10)}
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination" style="display:none">
+        <div class="page-info" id="page-info"></div>
+        <div class="page-btns" id="page-btns"></div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Table -->
-  <div class="table-panel">
-    <div class="table-header">
-      <div class="table-title">Resultados</div>
-      <div class="showing-info" id="showing-info">Carregando...</div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th onclick="sortBy('nome')">Clube</th>
-            <th onclick="sortBy('cidade')">Cidade / Estado</th>
-            <th onclick="sortBy('estadio')">Estádio</th>
-            <th onclick="sortBy('fundacao')">Fundação</th>
-            <th>Ligas</th>
-            <th>Temporadas</th>
-          </tr>
-        </thead>
-        <tbody id="table-body">
-          ${skeletonRows(10)}
-        </tbody>
-      </table>
-    </div>
-    <div class="pagination" id="pagination" style="display:none">
-      <div class="page-info" id="page-info"></div>
-      <div class="page-btns" id="page-btns"></div>
-    </div>
-  </div>
+  <script>
+    const SUPABASE_URL = 'https://rwtnhzonkhgwnwvdkltk.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3dG5oem9ua2hnd253dmRrbHRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMzQ4MTUsImV4cCI6MjA4NzcxMDgxNX0._0pRAoCYr8OlL6DafgOrhu4X8Vbz4ScWfaa6KLOzFYs';
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-</div>
+    const PER_PAGE = 20;
+    let currentPage = 1;
+    let totalCount = 0;
+    let sortCol = 'nome';
+    let sortDir = 'asc';
+    let debounceTimer;
+    let ligasMap = {}; // clube_id -> [{liga_nome, temporada}]
 
-<script>
-const SUPABASE_URL = 'https://rwtnhzonkhgwnwvdkltk.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3dG5oem9ua2hnd253dmRrbHRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMzQ4MTUsImV4cCI6MjA4NzcxMDgxNX0._0pRAoCYr8OlL6DafgOrhu4X8Vbz4ScWfaa6KLOzFYs';
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const PER_PAGE   = 20;
-let currentPage  = 1;
-let totalCount   = 0;
-let sortCol      = 'nome';
-let sortDir      = 'asc';
-let debounceTimer;
-let ligasMap     = {}; // clube_id -> [{liga_nome, temporada}]
-
-// ── Init ──────────────────────────────────────────────
-async function init() {
-  await Promise.all([carregarFiltros(), carregarStats()]);
-  await carregarClubes();
-}
-
-// ── Stats gerais ──────────────────────────────────────
-async function carregarStats() {
-  const [
-    { count: total },
-    { data: paises },
-    { data: ligas },
-    { data: temps }
-  ] = await Promise.all([
-    db.from('clubes_futebol_2').select('*', { count: 'exact', head: true }),
-    db.from('clubes_futebol_2').select('pais').neq('pais', null),
-    db.from('clubes_ligas').select('liga_nome').neq('liga_nome', null),
-    db.from('clubes_ligas').select('temporada').neq('temporada', null)
-  ]);
-
-  const uniquePaises    = new Set((paises || []).map(r => r.pais)).size;
-  const uniqueLigas     = new Set((ligas  || []).map(r => r.liga_nome)).size;
-  const uniqueTemps     = new Set((temps  || []).map(r => r.temporada)).size;
-
-  document.getElementById('stat-total').textContent      = total || 0;
-  document.getElementById('stat-paises').textContent     = uniquePaises;
-  document.getElementById('stat-ligas').textContent      = uniqueLigas;
-  document.getElementById('stat-temporadas').textContent = uniqueTemps;
-  document.getElementById('total-badge').textContent     = `${total || 0} clubes`;
-}
-
-// ── Filtros dinâmicos ─────────────────────────────────
-async function carregarFiltros() {
-  const [{ data: paises }, { data: ligas }, { data: temps }] = await Promise.all([
-    db.from('clubes_futebol_2').select('pais').neq('pais', null).order('pais'),
-    db.from('clubes_ligas').select('liga_nome').neq('liga_nome', null).order('liga_nome'),
-    db.from('clubes_ligas').select('temporada').neq('temporada', null).order('temporada', { ascending: false })
-  ]);
-
-  const uniquePaises = [...new Set((paises || []).map(r => r.pais))];
-  const uniqueLigas  = [...new Set((ligas  || []).map(r => r.liga_nome))];
-  const uniqueTemps  = [...new Set((temps  || []).map(r => r.temporada))];
-
-  const selPais = document.getElementById('f-pais');
-  uniquePaises.forEach(p => {
-    const o = document.createElement('option'); o.value = p; o.textContent = p; selPais.appendChild(o);
-  });
-
-  const selLiga = document.getElementById('f-liga');
-  uniqueLigas.forEach(l => {
-    const o = document.createElement('option'); o.value = l; o.textContent = l; selLiga.appendChild(o);
-  });
-
-  const selTemp = document.getElementById('f-temporada');
-  uniqueTemps.forEach(t => {
-    const o = document.createElement('option'); o.value = t; o.textContent = t; selTemp.appendChild(o);
-  });
-}
-
-// ── Carregar clubes ───────────────────────────────────
-async function carregarClubes() {
-  const nome      = document.getElementById('f-nome').value.trim();
-  const pais      = document.getElementById('f-pais').value;
-  const liga      = document.getElementById('f-liga').value;
-  const temporada = document.getElementById('f-temporada').value;
-
-  mostrarSkeleton();
-
-  // Se tem filtro por liga ou temporada, busca IDs via clubes_ligas
-  let idsPermitidos = null;
-  if (liga || temporada) {
-    let q = db.from('clubes_ligas').select('clube_id');
-    if (liga)      q = q.eq('liga_nome', liga);
-    if (temporada) q = q.eq('temporada', parseInt(temporada));
-    const { data } = await q;
-    idsPermitidos = (data || []).map(r => r.clube_id);
-    if (!idsPermitidos.length) {
-      renderVazio();
-      return;
+    // ── Init ──────────────────────────────────────────────
+    async function init() {
+      await Promise.all([carregarFiltros(), carregarStats()]);
+      await carregarClubes();
     }
-  }
 
-  // Query principal com paginação
-  const from = (currentPage - 1) * PER_PAGE;
-  const to   = from + PER_PAGE - 1;
+    // ── Stats gerais ──────────────────────────────────────
+    async function carregarStats() {
+      const [
+        { count: total },
+        { data: paises },
+        { data: ligas },
+        { data: temps }
+      ] = await Promise.all([
+        db.from('clubes_futebol_2').select('*', { count: 'exact', head: true }),
+        db.from('clubes_futebol_2').select('pais').neq('pais', null),
+        db.from('clubes_ligas').select('liga_nome').neq('liga_nome', null),
+        db.from('clubes_ligas').select('temporada').neq('temporada', null)
+      ]);
 
-  let q = db.from('clubes_futebol_2')
-    .select('*', { count: 'exact' })
-    .order(sortCol, { ascending: sortDir === 'asc' })
-    .range(from, to);
+      const uniquePaises = new Set((paises || []).map(r => r.pais)).size;
+      const uniqueLigas = new Set((ligas || []).map(r => r.liga_nome)).size;
+      const uniqueTemps = new Set((temps || []).map(r => r.temporada)).size;
 
-  if (nome) q = q.ilike('nome', `%${nome}%`);
-  if (pais) q = q.eq('pais', pais);
-  if (idsPermitidos) q = q.in('id', idsPermitidos);
+      document.getElementById('stat-total').textContent = total || 0;
+      document.getElementById('stat-paises').textContent = uniquePaises;
+      document.getElementById('stat-ligas').textContent = uniqueLigas;
+      document.getElementById('stat-temporadas').textContent = uniqueTemps;
+      document.getElementById('total-badge').textContent = `${total || 0} clubes`;
+    }
 
-  const { data: clubes, count, error } = await q;
-  if (error) { console.error(error); return; }
+    // ── Filtros dinâmicos ─────────────────────────────────
+    async function carregarFiltros() {
+      const [{ data: paises }, { data: ligas }, { data: temps }] = await Promise.all([
+        db.from('clubes_futebol_2').select('pais').neq('pais', null).order('pais'),
+        db.from('clubes_ligas').select('liga_nome').neq('liga_nome', null).order('liga_nome'),
+        db.from('clubes_ligas').select('temporada').neq('temporada', null).order('temporada', { ascending: false })
+      ]);
 
-  totalCount = count || 0;
+      const uniquePaises = [...new Set((paises || []).map(r => r.pais))];
+      const uniqueLigas = [...new Set((ligas || []).map(r => r.liga_nome))];
+      const uniqueTemps = [...new Set((temps || []).map(r => r.temporada))];
 
-  // Busca ligas de todos os clubes retornados
-  if (clubes && clubes.length) {
-    const ids = clubes.map(c => c.id);
-    const { data: ligasData } = await db
-      .from('clubes_ligas')
-      .select('clube_id, liga_nome, temporada')
-      .in('clube_id', ids);
+      const selPais = document.getElementById('f-pais');
+      uniquePaises.forEach(p => {
+        const o = document.createElement('option'); o.value = p; o.textContent = p; selPais.appendChild(o);
+      });
 
-    ligasMap = {};
-    (ligasData || []).forEach(l => {
-      if (!ligasMap[l.clube_id]) ligasMap[l.clube_id] = [];
-      ligasMap[l.clube_id].push({ liga_nome: l.liga_nome, temporada: l.temporada });
-    });
-  }
+      const selLiga = document.getElementById('f-liga');
+      uniqueLigas.forEach(l => {
+        const o = document.createElement('option'); o.value = l; o.textContent = l; selLiga.appendChild(o);
+      });
 
-  renderTabela(clubes || []);
-  renderPaginacao();
-  atualizarInfo();
-}
+      const selTemp = document.getElementById('f-temporada');
+      uniqueTemps.forEach(t => {
+        const o = document.createElement('option'); o.value = t; o.textContent = t; selTemp.appendChild(o);
+      });
+    }
 
-// ── Render tabela ─────────────────────────────────────
-function renderTabela(clubes) {
-  const tbody = document.getElementById('table-body');
+    // ── Carregar clubes ───────────────────────────────────
+    async function carregarClubes() {
+      const nome = document.getElementById('f-nome').value.trim();
+      const pais = document.getElementById('f-pais').value;
+      const liga = document.getElementById('f-liga').value;
+      const temporada = document.getElementById('f-temporada').value;
 
-  if (!clubes.length) {
-    renderVazio();
-    return;
-  }
+      mostrarSkeleton();
 
-  tbody.innerHTML = clubes.map(c => {
-    const ligas = ligasMap[c.id] || [];
-    const ligasUnicas   = [...new Set(ligas.map(l => l.liga_nome))];
-    const tempsUnicas   = [...new Set(ligas.map(l => l.temporada))].sort((a,b) => b - a);
+      // Se tem filtro por liga ou temporada, busca IDs via clubes_ligas
+      let idsPermitidos = null;
+      if (liga || temporada) {
+        let q = db.from('clubes_ligas').select('clube_id');
+        if (liga) q = q.eq('liga_nome', liga);
+        if (temporada) q = q.eq('temporada', parseInt(temporada));
+        const { data } = await q;
+        idsPermitidos = (data || []).map(r => r.clube_id);
+        if (!idsPermitidos.length) {
+          renderVazio();
+          return;
+        }
+      }
 
-    const ligasTags = ligasUnicas.map(l =>
-      `<span class="liga-tag">${l}</span>`
-    ).join('') || '<span style="color:var(--muted);font-size:11px">—</span>';
+      // Query principal com paginação
+      const from = (currentPage - 1) * PER_PAGE;
+      const to = from + PER_PAGE - 1;
 
-    const tempsTags = tempsUnicas.map(t =>
-      `<span class="temp-tag">${t}</span>`
-    ).join('') || '<span style="color:var(--muted);font-size:11px">—</span>';
+      let q = db.from('clubes_futebol_2')
+        .select('*', { count: 'exact' })
+        .order(sortCol, { ascending: sortDir === 'asc' })
+        .range(from, to);
 
-    // Tenta extrair estado da cidade (ex: "Curitiba, Paraná")
-    const cidadeParts = (c.cidade || '').split(',');
-    const cidadeNome  = cidadeParts[0]?.trim() || '—';
-    const estadoNome  = cidadeParts[1]?.trim() || '';
+      if (nome) q = q.ilike('nome', `%${nome}%`);
+      if (pais) q = q.eq('pais', pais);
+      if (idsPermitidos) q = q.in('id', idsPermitidos);
 
-    return `
+      const { data: clubes, count, error } = await q;
+      if (error) { console.error(error); return; }
+
+      totalCount = count || 0;
+
+      // Busca ligas de todos os clubes retornados
+      if (clubes && clubes.length) {
+        const ids = clubes.map(c => c.id);
+        const { data: ligasData } = await db
+          .from('clubes_ligas')
+          .select('clube_id, liga_nome, temporada')
+          .in('clube_id', ids);
+
+        ligasMap = {};
+        (ligasData || []).forEach(l => {
+          if (!ligasMap[l.clube_id]) ligasMap[l.clube_id] = [];
+          ligasMap[l.clube_id].push({ liga_nome: l.liga_nome, temporada: l.temporada });
+        });
+      }
+
+      renderTabela(clubes || []);
+      renderPaginacao();
+      atualizarInfo();
+    }
+
+    // ── Render tabela ─────────────────────────────────────
+    function renderTabela(clubes) {
+      const tbody = document.getElementById('table-body');
+
+      if (!clubes.length) {
+        renderVazio();
+        return;
+      }
+
+      tbody.innerHTML = clubes.map(c => {
+        const ligas = ligasMap[c.id] || [];
+        const ligasUnicas = [...new Set(ligas.map(l => l.liga_nome))];
+        const tempsUnicas = [...new Set(ligas.map(l => l.temporada))].sort((a, b) => b - a);
+
+        const ligasTags = ligasUnicas.map(l =>
+          `<span class="liga-tag">${l}</span>`
+        ).join('') || '<span style="color:var(--muted);font-size:11px">—</span>';
+
+        const tempsTags = tempsUnicas.map(t =>
+          `<span class="temp-tag">${t}</span>`
+        ).join('') || '<span style="color:var(--muted);font-size:11px">—</span>';
+
+        // Tenta extrair estado da cidade (ex: "Curitiba, Paraná")
+        const cidadeParts = (c.cidade || '').split(',');
+        const cidadeNome = cidadeParts[0]?.trim() || '—';
+        const estadoNome = cidadeParts[1]?.trim() || '';
+
+        return `
       <tr>
         <td>
           <div class="club-cell">
@@ -404,11 +905,11 @@ function renderTabela(clubes) {
         <td style="max-width:220px">${ligasTags}</td>
         <td>${tempsTags}</td>
       </tr>`;
-  }).join('');
-}
+      }).join('');
+    }
 
-function renderVazio() {
-  document.getElementById('table-body').innerHTML = `
+    function renderVazio() {
+      document.getElementById('table-body').innerHTML = `
     <tr><td colspan="6">
       <div class="empty-state">
         <div class="empty-icon">⚽</div>
@@ -416,111 +917,112 @@ function renderVazio() {
         <div class="empty-sub">Tente ajustar os filtros</div>
       </div>
     </td></tr>`;
-  document.getElementById('pagination').style.display = 'none';
-  document.getElementById('showing-info').textContent = '0 resultados';
-}
+      document.getElementById('pagination').style.display = 'none';
+      document.getElementById('showing-info').textContent = '0 resultados';
+    }
 
-function mostrarSkeleton() {
-  const rows = Array(10).fill(0).map(() => `
+    function mostrarSkeleton() {
+      const rows = Array(10).fill(0).map(() => `
     <tr>
-      ${Array(6).fill(0).map(() => `<td><div class="skeleton" style="width:${60+Math.random()*40}%"></div></td>`).join('')}
+      ${Array(6).fill(0).map(() => `<td><div class="skeleton" style="width:${60 + Math.random() * 40}%"></div></td>`).join('')}
     </tr>`).join('');
-  document.getElementById('table-body').innerHTML = rows;
-  document.getElementById('pagination').style.display = 'none';
-  document.getElementById('showing-info').textContent = 'Carregando...';
-}
+      document.getElementById('table-body').innerHTML = rows;
+      document.getElementById('pagination').style.display = 'none';
+      document.getElementById('showing-info').textContent = 'Carregando...';
+    }
 
-// ── Paginação ─────────────────────────────────────────
-function renderPaginacao() {
-  const totalPages = Math.ceil(totalCount / PER_PAGE);
-  const pag = document.getElementById('pagination');
+    // ── Paginação ─────────────────────────────────────────
+    function renderPaginacao() {
+      const totalPages = Math.ceil(totalCount / PER_PAGE);
+      const pag = document.getElementById('pagination');
 
-  if (totalPages <= 1) { pag.style.display = 'none'; return; }
-  pag.style.display = 'flex';
+      if (totalPages <= 1) { pag.style.display = 'none'; return; }
+      pag.style.display = 'flex';
 
-  const btns = document.getElementById('page-btns');
+      const btns = document.getElementById('page-btns');
 
-  // Páginas a mostrar
-  let pages = [];
-  if (totalPages <= 7) {
-    pages = Array.from({length: totalPages}, (_, i) => i + 1);
-  } else {
-    pages = [1];
-    if (currentPage > 3) pages.push('...');
-    for (let i = Math.max(2, currentPage-1); i <= Math.min(totalPages-1, currentPage+1); i++) pages.push(i);
-    if (currentPage < totalPages - 2) pages.push('...');
-    pages.push(totalPages);
-  }
+      // Páginas a mostrar
+      let pages = [];
+      if (totalPages <= 7) {
+        pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+      } else {
+        pages = [1];
+        if (currentPage > 3) pages.push('...');
+        for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+        if (currentPage < totalPages - 2) pages.push('...');
+        pages.push(totalPages);
+      }
 
-  btns.innerHTML = `
-    <button class="page-btn arrow" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>
+      btns.innerHTML = `
+    <button class="page-btn arrow" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>
     ${pages.map(p => p === '...'
-      ? `<span style="color:var(--muted);padding:0 4px">…</span>`
-      : `<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`
-    ).join('')}
-    <button class="page-btn arrow" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>›</button>`;
-}
+        ? `<span style="color:var(--muted);padding:0 4px">…</span>`
+        : `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`
+      ).join('')}
+    <button class="page-btn arrow" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+    }
 
-function goPage(p) {
-  const totalPages = Math.ceil(totalCount / PER_PAGE);
-  if (p < 1 || p > totalPages) return;
-  currentPage = p;
-  carregarClubes();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+    function goPage(p) {
+      const totalPages = Math.ceil(totalCount / PER_PAGE);
+      if (p < 1 || p > totalPages) return;
+      currentPage = p;
+      carregarClubes();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-function atualizarInfo() {
-  const from  = (currentPage - 1) * PER_PAGE + 1;
-  const to    = Math.min(currentPage * PER_PAGE, totalCount);
-  document.getElementById('showing-info').innerHTML =
-    `Mostrando <span>${from}–${to}</span> de <span>${totalCount}</span> clubes`;
-  document.getElementById('page-info').innerHTML =
-    `Página <span>${currentPage}</span> de <span>${Math.ceil(totalCount/PER_PAGE)}</span>`;
-}
+    function atualizarInfo() {
+      const from = (currentPage - 1) * PER_PAGE + 1;
+      const to = Math.min(currentPage * PER_PAGE, totalCount);
+      document.getElementById('showing-info').innerHTML =
+        `Mostrando <span>${from}–${to}</span> de <span>${totalCount}</span> clubes`;
+      document.getElementById('page-info').innerHTML =
+        `Página <span>${currentPage}</span> de <span>${Math.ceil(totalCount / PER_PAGE)}</span>`;
+    }
 
-// ── Sort ──────────────────────────────────────────────
-function sortBy(col) {
-  if (sortCol === col) {
-    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-  } else {
-    sortCol = col; sortDir = 'asc';
-  }
-  // Atualiza visual
-  document.querySelectorAll('thead th').forEach(th => {
-    th.classList.remove('sort-asc','sort-desc');
-  });
-  const cols = ['nome','cidade','estadio','fundacao','ligas','temporadas'];
-  const idx  = cols.indexOf(col);
-  if (idx >= 0) {
-    const ths = document.querySelectorAll('thead th');
-    if (ths[idx]) ths[idx].classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
-  }
-  currentPage = 1;
-  carregarClubes();
-}
+    // ── Sort ──────────────────────────────────────────────
+    function sortBy(col) {
+      if (sortCol === col) {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortCol = col; sortDir = 'asc';
+      }
+      // Atualiza visual
+      document.querySelectorAll('thead th').forEach(th => {
+        th.classList.remove('sort-asc', 'sort-desc');
+      });
+      const cols = ['nome', 'cidade', 'estadio', 'fundacao', 'ligas', 'temporadas'];
+      const idx = cols.indexOf(col);
+      if (idx >= 0) {
+        const ths = document.querySelectorAll('thead th');
+        if (ths[idx]) ths[idx].classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+      }
+      currentPage = 1;
+      carregarClubes();
+    }
 
-// ── Filtros ───────────────────────────────────────────
-function aplicarFiltros() {
-  currentPage = 1;
-  carregarClubes();
-}
+    // ── Filtros ───────────────────────────────────────────
+    function aplicarFiltros() {
+      currentPage = 1;
+      carregarClubes();
+    }
 
-function limparFiltros() {
-  document.getElementById('f-nome').value      = '';
-  document.getElementById('f-pais').value      = '';
-  document.getElementById('f-liga').value      = '';
-  document.getElementById('f-temporada').value = '';
-  currentPage = 1;
-  carregarClubes();
-}
+    function limparFiltros() {
+      document.getElementById('f-nome').value = '';
+      document.getElementById('f-pais').value = '';
+      document.getElementById('f-liga').value = '';
+      document.getElementById('f-temporada').value = '';
+      currentPage = 1;
+      carregarClubes();
+    }
 
-function debounceSearch() {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => aplicarFiltros(), 400);
-}
+    function debounceSearch() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => aplicarFiltros(), 400);
+    }
 
-// ── Start ─────────────────────────────────────────────
-init();
-</script>
+    // ── Start ─────────────────────────────────────────────
+    init();
+  </script>
 </body>
+
 </html>
